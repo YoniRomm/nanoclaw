@@ -184,6 +184,19 @@ function buildVolumeMounts(
     readonly: false,
   });
 
+  // Mount host's ~/.gemini to inherit OAuth credentials natively
+  const homeGeminiDir = path.join(
+    process.env.HOME || process.env.USERPROFILE || '',
+    '.gemini',
+  );
+  if (fs.existsSync(homeGeminiDir)) {
+    mounts.push({
+      hostPath: homeGeminiDir,
+      containerPath: '/home/node/.gemini',
+      readonly: false,
+    });
+  }
+
   // Per-group IPC namespace: each group gets its own IPC directory
   // This prevents cross-group privilege escalation via IPC
   const groupIpcDir = resolveGroupIpcPath(group.folder);
