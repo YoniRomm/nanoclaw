@@ -217,7 +217,11 @@ async function runQuery(
     geminiArgs.push('--approval-mode', 'auto_edit');
     geminiArgs.push('--allowed-mcp-server-names', 'nanoclaw');
 
-    const geminiEnv = { ...sdkEnv, PATH: process.env.PATH + ':/usr/local/bin:/usr/bin' };
+    const geminiEnv = { 
+      ...sdkEnv, 
+      HOME: '/home/node',
+      PATH: process.env.PATH + ':/usr/local/bin:/usr/bin' 
+    };
 
     const child = spawn('gemini', geminiArgs, {
       cwd: '/workspace/group',
@@ -244,10 +248,14 @@ async function runQuery(
            if (msg.type === 'message' && msg.role === 'assistant') {
              accumulatedResult += (msg.content || '');
            }
-           if (msg.type === 'result') {
-             writeOutput({ status: 'success', result: accumulatedResult || null, newSessionId });
-             accumulatedResult = ''; // reset for next query
-           }
+            if (msg.type === 'result') {
+              const text = (accumulatedResult || '')
+                              .replace(/<internal>[\s\S]*?<\/internal>/g, '')
+                              .replace(/^\s*I will[\s\S]*?\.\s*/gm, '')
+                              .trim();
+              writeOutput({ status: 'success', result: text || null, newSessionId });
+              accumulatedResult = ''; // reset for next query
+            }
          } catch (e) {}
       }
     });

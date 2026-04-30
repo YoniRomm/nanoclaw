@@ -111,11 +111,20 @@ async function syncGroups(projectRoot: string): Promise<void> {
   let syncOk = false;
   try {
     const syncScript = `
-import makeWASocket, { useMultiFileAuthState, makeCacheableSignalKeyStore, Browsers } from '@whiskeysockets/baileys';
+import { makeWASocket, useMultiFileAuthState, makeCacheableSignalKeyStore, Browsers } from '@whiskeysockets/baileys';
 import pino from 'pino';
 import path from 'path';
 import fs from 'fs';
 import Database from 'better-sqlite3';
+
+import { createRequire } from 'module';
+const _require = createRequire(import.meta.url);
+const _generics = _require('@whiskeysockets/baileys/lib/Utils/generics');
+const { proto } = _require('@whiskeysockets/baileys');
+_generics.getPlatformId = (browser) => {
+  const platformType = proto.DeviceProps.PlatformType[browser.toUpperCase()];
+  return platformType ? platformType.toString() : '1';
+};
 
 const logger = pino({ level: 'silent' });
 const authDir = path.join('store', 'auth');
