@@ -169,7 +169,9 @@ async function connectSocket(
           if (credsOnDisk.registered === true || waited >= 12000) {
             clearInterval(waitForRegistered);
             fs.writeFileSync(STATUS_FILE, 'authenticated');
-            try { fs.unlinkSync(QR_FILE); } catch {}
+            try {
+              fs.unlinkSync(QR_FILE);
+            } catch {}
             console.log('  Registration complete — credentials ready.\n');
             setTimeout(() => process.exit(0), 500);
           }
