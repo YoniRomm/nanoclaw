@@ -37,7 +37,7 @@ export class GeminiProvider implements AgentProvider {
 
     let finalPrompt = input.prompt;
     if (input.systemContext?.instructions) {
-      finalPrompt = input.prompt + "\\n\\n[Global Context]\\n" + input.systemContext.instructions;
+      finalPrompt = input.prompt + "\n\n[Global Context]\n" + input.systemContext.instructions;
     }
 
     const args: string[] = [];
@@ -68,7 +68,7 @@ export class GeminiProvider implements AgentProvider {
     // Stream for incoming push messages (e.g. tool output, IPC messages)
     const pushMessage = (msg: string) => {
       if (!aborted && child.stdin && !child.stdin.destroyed) {
-        child.stdin.write(msg + '\\n');
+        child.stdin.write(msg + '\n');
       }
     };
 
@@ -81,7 +81,7 @@ export class GeminiProvider implements AgentProvider {
         if (aborted) break;
 
         buffer += chunk.toString();
-        const lines = buffer.split('\\n');
+        const lines = buffer.split('\n');
         buffer = lines.pop() || '';
 
         for (const line of lines) {
@@ -98,8 +98,8 @@ export class GeminiProvider implements AgentProvider {
               accumulatedResult += (msg.content || '');
             } else if (msg.type === 'result') {
               const text = (accumulatedResult || '')
-                              .replace(/<internal>[\\s\\S]*?<\\/internal>/g, '')
-                              .replace(/^\\s*I will[\\s\\S]*?\\.\\s*/gm, '')
+                              .replace(/<internal>[\s\S]*?<\/internal>/g, '')
+                              .replace(/^\s*I will[\s\S]*?\.\s*/gm, '')
                               .trim();
               yield { type: 'result', text: text || null } as ProviderEvent;
               accumulatedResult = ''; // reset for next query
