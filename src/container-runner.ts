@@ -332,10 +332,7 @@ function buildMounts(
   }
 
   // Mount host's ~/.gemini to inherit OAuth credentials natively
-  const homeGeminiDir = path.join(
-    process.env.HOME || process.env.USERPROFILE || '',
-    '.gemini',
-  );
+  const homeGeminiDir = path.join(process.env.HOME || process.env.USERPROFILE || '', '.gemini');
   if (fs.existsSync(homeGeminiDir)) {
     mounts.push({
       hostPath: homeGeminiDir,
